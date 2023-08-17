@@ -15,27 +15,38 @@ c.fillRect(0,0,canvas.width,canvas.height)
 
 //gravity constant to pull objects down if they are above
 //canvas bottom
-const gravity = 0.2
+const gravity = 0.5
 
 //class to create a character, many elements in here that define a 
 //general 'character'
 class Sprite 
 {
     //position and velocity are passed into the class
-    constructor({position, velocity})
+    constructor({position, velocity, color= 'red'})
     {
         //elements that can be manipulated independently from 'characters'
         this.position = position
         this.velocity = velocity
         this.height = 150
         this.lastKey
+        this.attackBox =
+        {
+            position: this.position,
+            width: 100,
+            height: 50
+        }
+        this.color = color
     }
     //this methid draws the 'chracters' to be seen on the canvas
     draw() 
     {
 
-        c.fillStyle= 'red'
+        c.fillStyle= this.color
         c.fillRect(this.position.x,this.position.y,50,150)
+
+        //attack box
+        c.fillStyle = 'green'
+        c.fillRect(this.attackBox.position.x, this.attackBox.position.y,this.attackBox.width, this.attackBox.height)
     }
     //this method is used to update the velocity or postion of the 
     //character on the canvas, and is where gravity comes into play
@@ -68,7 +79,8 @@ const player = new Sprite({
     {
         x:0,
         y:0
-    }
+    },
+    
 
 })
 
@@ -87,7 +99,8 @@ const enemy = new Sprite({
     {
         x:0,
         y:0
-    }
+    },
+    color: "blue"
 
 })
 
@@ -104,10 +117,17 @@ const keys =
     w:
     {
         pressed: false
+    },
+    ArrowRight:
+    {
+        pressed: false
+    },
+    ArrowLeft:
+    {
+        pressed: false
     }
 }
 
-let lastKey
 
 
 //function to animate and progress movement and frames on the canvas
@@ -125,11 +145,23 @@ function animate() {
     player.update()
     enemy.update()
     player.velocity.x = 0
-    if (keys.a.pressed && lastKey == 'a')
+    enemy.velocity.x = 0
+
+    //player movement
+    if (keys.a.pressed && player.lastKey == 'a')
     {
-        player.velocity.x = -1
-    } else if (keys.d.pressed && lastKey == 'd') {
-        player.velocity.x = 1
+        player.velocity.x = -5
+    } else if (keys.d.pressed && player.lastKey == 'd') {
+        player.velocity.x = 5
+    }
+
+    //enemy movement
+    if (keys.ArrowLeft.pressed && enemy.lastKey == 'ArrowLeft')
+    {
+        console.log('first')
+        enemy.velocity.x = -5
+    } else if (keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight') {
+        enemy.velocity.x = 5
     }
 
 }
@@ -141,17 +173,20 @@ animate()
 window.addEventListener('keydown', (event) => {
     switch (event.key)
     {
+        //player
         case 'd':
             keys.d.pressed = true
-            lastKey = 'd'
+            player.lastKey = 'd'
             break
         case 'a':
             keys.a.pressed = true
-            lastKey = 'a'
+            player.lastKey = 'a'
             break
         case 'w':
-            player.velocity.y = -10
+            player.velocity.y = -20
             break
+
+        //enemy
         case 'ArrowRight':
             keys.ArrowRight.pressed = true
             enemy.lastKey = 'ArrowRight'
@@ -161,7 +196,7 @@ window.addEventListener('keydown', (event) => {
             enemy.lastKey = 'ArrowLeft'
             break
         case 'ArrowUp':
-            enemy.velocity.y = -10
+            enemy.velocity.y = -20
             break
     }
     console.log(event.key);
@@ -170,15 +205,23 @@ window.addEventListener('keydown', (event) => {
 window.addEventListener('keyup', (event) => {
     switch (event.key)
     {
+        //player
         case 'd':
             keys.d.pressed = false
             break
         case 'a':
             keys.a.pressed = false
             break
-        case 'w':
-            keys.w.pressed = false
+       
+
+        //enemy
+        case 'ArrowRight':
+            keys.ArrowRight.pressed = false
             break
+        case 'ArrowLeft':
+            keys.ArrowLeft.pressed = false
+            break
+        
         
     }
     console.log(event.key);
