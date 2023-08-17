@@ -22,37 +22,56 @@ const gravity = 0.5
 class Sprite 
 {
     //position and velocity are passed into the class
-    constructor({position, velocity, color= 'red'})
+    constructor({position, velocity, color= 'red', offset})
     {
         //elements that can be manipulated independently from 'characters'
         this.position = position
         this.velocity = velocity
+        this.width = 50
         this.height = 150
         this.lastKey
         this.attackBox =
         {
-            position: this.position,
-            width: 100,
-            height: 50
-        }
+        position: 
+            {
+                x: this.position.x,
+                y: this.position.y
+            },
+        offset: offset
+       ,
+        width: 100,
+        height: 50,
+
+        },
+        
         this.color = color
+        this.isAttaking
     }
     //this methid draws the 'chracters' to be seen on the canvas
     draw() 
     {
 
         c.fillStyle= this.color
-        c.fillRect(this.position.x,this.position.y,50,150)
+        c.fillRect(this.position.x,this.position.y,this.width,150)
 
         //attack box
-        c.fillStyle = 'green'
-        c.fillRect(this.attackBox.position.x, this.attackBox.position.y,this.attackBox.width, this.attackBox.height)
+        if(this.isAttacking === true) 
+        {
+            c.fillStyle = 'green'
+            c.fillRect(this.attackBox.position.x, 
+            this.attackBox.position.y,
+            this.attackBox.width, 
+            this.attackBox.height)
+        }
+        
     }
     //this method is used to update the velocity or postion of the 
     //character on the canvas, and is where gravity comes into play
     update ()
     {
         this.draw()
+        this.attackBox.position.x = this.position.x - this.attackBox.offset.x
+        this.attackBox.position.y = this.position.y
 
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
@@ -64,6 +83,16 @@ class Sprite
         {
             this.velocity.y = 0
         } else this.velocity.y += gravity
+    }
+
+    attack() {
+        this.isAttacking = true
+       
+        setTimeout(()=>{
+
+                this.isAttacking = false
+
+        }, 100)
     }
 }
 
@@ -80,6 +109,11 @@ const player = new Sprite({
         x:0,
         y:0
     },
+    offset:
+    {
+        x: 0,
+        y: 0
+    }
     
 
 })
@@ -100,7 +134,12 @@ const enemy = new Sprite({
         x:0,
         y:0
     },
-    color: "blue"
+    color: "blue",
+    offset:
+    {
+        x: 50,
+        y: 0
+    }
 
 })
 
@@ -128,6 +167,18 @@ const keys =
     }
 }
 
+function rectangleCollision ({
+    rectangle1,
+    rectangle2
+
+}) {
+    return (
+        rectangle1.attackBox.position.x + rectangle1.attackBox.width >= rectangle2.position.x
+        &&  rectangle1.attackBox.position.x <= rectangle2.position.x + rectangle2.width
+        && rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y
+        && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
+    )
+}
 
 
 //function to animate and progress movement and frames on the canvas
@@ -164,6 +215,35 @@ function animate() {
         enemy.velocity.x = 5
     }
 
+    //collision register for player
+    if(
+        rectangleCollision({
+            rectangle1: enemy,
+            rectangle2: player
+        })
+
+        && player.isAttacking === true)
+    {
+        console.log('dead')
+        player.isAttacking = false;
+    }
+
+    //collision register for enemy
+    if(
+        rectangleCollision({
+            rectangle1: player,
+            rectangle2: enemy
+        })
+        
+        && enemy.isAttacking === true)
+    {
+        
+        enemy.isAttacking = false;
+        console.log(' Enemy dead')
+
+    }
+
+
 }
 
 animate()
@@ -185,6 +265,9 @@ window.addEventListener('keydown', (event) => {
         case 'w':
             player.velocity.y = -20
             break
+        case ' ':
+            player.attack()
+            break
 
         //enemy
         case 'ArrowRight':
@@ -197,6 +280,9 @@ window.addEventListener('keydown', (event) => {
             break
         case 'ArrowUp':
             enemy.velocity.y = -20
+            break
+        case 'ArrowDown':
+            enemy.attack()
             break
     }
     console.log(event.key);
@@ -212,6 +298,7 @@ window.addEventListener('keyup', (event) => {
         case 'a':
             keys.a.pressed = false
             break
+        
        
 
         //enemy
