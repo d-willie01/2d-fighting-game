@@ -46,6 +46,7 @@ class Sprite
         
         this.color = color
         this.isAttaking
+        this.health = 100
     }
     //this methid draws the 'chracters' to be seen on the canvas
     draw() 
@@ -225,6 +226,8 @@ function animate() {
         && player.isAttacking === true)
     {
         console.log('dead')
+        enemy.health -= 10
+        document.querySelector('#enemyHealth').style.width = enemy.health + '%'
         player.isAttacking = false;
     }
 
@@ -239,6 +242,8 @@ function animate() {
     {
         
         enemy.isAttacking = false;
+        player.health -= 10
+        document.querySelector('#playerHealth').style.width = player.health + '%'
         console.log(' Enemy dead')
 
     }
