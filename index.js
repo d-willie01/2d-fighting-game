@@ -181,6 +181,24 @@ function rectangleCollision ({
     )
 }
 
+let timer = 10
+function decreaseTimer () {
+    
+    if(timer >= 0)
+    {
+        setTimeout(decreaseTimer, 1000)
+        document.querySelector('#timer').innerHTML = timer
+        timer --
+        
+    }
+    if (player.health == enemy.health)
+    {
+        console.log('tie')
+    } 
+}
+
+decreaseTimer()
+
 
 //function to animate and progress movement and frames on the canvas
 //runs in a loop and is essentially the play button for the game
