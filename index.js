@@ -30,6 +30,9 @@ class Sprite
         this.width = 50
         this.height = 150
         this.lastKey
+
+        //attackbox general area to land hitpoints on enemy, offset
+        //is passed in to specify side of attack
         this.attackBox =
         {
         position: 
@@ -44,11 +47,16 @@ class Sprite
 
         },
         
+        //can specify color of sprite, passed in
         this.color = color
+
+        //true or false boolean to indicate if attack is happening
         this.isAttaking
+
+        //health of player
         this.health = 100
     }
-    //this methid draws the 'chracters' to be seen on the canvas
+    //this methid draws the 'characters' to be seen on the canvas
     draw() 
     {
 
@@ -86,6 +94,8 @@ class Sprite
         } else this.velocity.y += gravity
     }
 
+    //method created to indicate attack from a created character, 
+    //only active for short amount of time using setTimeout function
     attack() {
         this.isAttacking = true
        
@@ -168,6 +178,9 @@ const keys =
     }
 }
 
+
+//General function defining the requirements of a hit on an enemy.
+//can now call this function as a check for hitting an enemy 
 function rectangleCollision ({
     rectangle1,
     rectangle2
@@ -181,6 +194,9 @@ function rectangleCollision ({
     )
 }
 
+
+//timer in the game canvas counting down then checking health for the
+//winner
 let timer = 10
 function decreaseTimer () {
     
@@ -251,6 +267,8 @@ function animate() {
 
     //collision register for enemy
     if(
+        //function call for collison passing in the two rectangle 
+        //params
         rectangleCollision({
             rectangle1: player,
             rectangle2: enemy
@@ -289,6 +307,7 @@ window.addEventListener('keydown', (event) => {
             player.velocity.y = -20
             break
         case ' ':
+            //calling method from class to check to see for points
             player.attack()
             break
 
@@ -305,6 +324,7 @@ window.addEventListener('keydown', (event) => {
             enemy.velocity.y = -20
             break
         case 'ArrowDown':
+            //calling method from class to check to see for points
             enemy.attack()
             break
     }
