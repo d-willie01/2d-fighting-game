@@ -19,97 +19,33 @@ const gravity = 0.5
 
 //class to create a character, many elements in here that define a 
 //general 'character'
-class Sprite 
-{
-    //position and velocity are passed into the class
-    constructor({position, velocity, color= 'red', offset})
-    {
-        //elements that can be manipulated independently from 'characters'
-        this.position = position
-        this.velocity = velocity
-        this.width = 50
-        this.height = 150
-        this.lastKey
 
-        //attackbox general area to land hitpoints on enemy, offset
-        //is passed in to specify side of attack
-        this.attackBox =
-        {
-        position: 
-            {
-                x: this.position.x,
-                y: this.position.y
-            },
-        offset: offset
-       ,
-        width: 100,
-        height: 50,
-
-        },
-        
-        //can specify color of sprite, passed in
-        this.color = color
-
-        //true or false boolean to indicate if attack is happening
-        this.isAttaking
-
-        //health of player
-        this.health = 100
-    }
-    //this methid draws the 'characters' to be seen on the canvas
-    draw() 
-    {
-
-        c.fillStyle= this.color
-        c.fillRect(this.position.x,this.position.y,this.width,150)
-
-        //attack box
-        if(this.isAttacking === true) 
-        {
-            c.fillStyle = 'green'
-            c.fillRect(this.attackBox.position.x, 
-            this.attackBox.position.y,
-            this.attackBox.width, 
-            this.attackBox.height)
-        }
-        
-    }
-    //this method is used to update the velocity or postion of the 
-    //character on the canvas, and is where gravity comes into play
-    update ()
-    {
-        this.draw()
-        this.attackBox.position.x = this.position.x - this.attackBox.offset.x
-        this.attackBox.position.y = this.position.y
-
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
-        this.velocity.y += gravity
-
-        //loop created to check of character is above the canvas bottom,
-        //if so it adds gravity back constantly until it hits bottom
-        if (this.position.y + this.height + this.velocity.y >= canvas.height)
-        {
-            this.velocity.y = 0
-        } else this.velocity.y += gravity
-    }
-
-    //method created to indicate attack from a created character, 
-    //only active for short amount of time using setTimeout function
-    attack() {
-        this.isAttacking = true
-       
-        setTimeout(()=>{
-
-                this.isAttacking = false
-
-        }, 100)
-    }
-}
 
 //player character created calling the class, with intial postions,
 //as well as intial velocities
-const player = new Sprite({
+
+const background = new Sprite ({
+    position:
+    {
+        x:0,
+        y:0
+    },
+    imageSrc: './assets/background.jpg'
+})
+
+const shop = new Sprite ({
+    position:
+    {
+        x:650,
+        y:256
+    },
+    imageSrc: './assets/shop_anim.png',
+    scale: 2.5,
+    framesMax: 6
+})
+
+
+const player = new Fighter({
     position: 
     {
         x: 0,
@@ -134,7 +70,7 @@ console.log(player)
 
 //enemy created calling the above class, with it,s own intial postions,
 //and velocities as well
-const enemy = new Sprite({
+const enemy = new Fighter({
     position: 
     {
         x: 400,
@@ -179,39 +115,7 @@ const keys =
 }
 
 
-//General function defining the requirements of a hit on an enemy.
-//can now call this function as a check for hitting an enemy 
-function rectangleCollision ({
-    rectangle1,
-    rectangle2
 
-}) {
-    return (
-        rectangle1.attackBox.position.x + rectangle1.attackBox.width >= rectangle2.position.x
-        &&  rectangle1.attackBox.position.x <= rectangle2.position.x + rectangle2.width
-        && rectangle1.attackBox.position.y + rectangle1.attackBox.height >= rectangle2.position.y
-        && rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
-    )
-}
-
-
-//timer in the game canvas counting down then checking health for the
-//winner
-let timer = 10
-function decreaseTimer () {
-    
-    if(timer >= 0)
-    {
-        setTimeout(decreaseTimer, 1000)
-        document.querySelector('#timer').innerHTML = timer
-        timer --
-        
-    }
-    if (player.health == enemy.health)
-    {
-        console.log('tie')
-    } 
-}
 
 decreaseTimer()
 
@@ -228,6 +132,8 @@ function animate() {
 
     c.fillStyle = 'black'
     c.fillRect(0,0,canvas.width,canvas.height)
+    background.update();
+    shop.update();
     player.update()
     enemy.update()
     player.velocity.x = 0
@@ -277,11 +183,18 @@ function animate() {
         && enemy.isAttacking === true)
     {
         
-        enemy.isAttacking = false;
+        
         player.health -= 10
         document.querySelector('#playerHealth').style.width = player.health + '%'
         console.log(' Enemy dead')
+        enemy.isAttacking = false;
 
+    }
+
+    //end game based on health
+    if (enemy.health <= 0 || player.health <= 0)
+    {
+        determineWinner({player, enemy, timerId})
     }
 
 
