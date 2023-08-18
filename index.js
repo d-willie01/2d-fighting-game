@@ -60,8 +60,13 @@ const player = new Fighter({
     {
         x: 0,
         y: 0
+    },
+    imageSrc: './assets/samStanceFinal.png',
+    framesMax: 5,
+    offset: {
+        x: 0,
+        y:187
     }
-    
 
 })
 
@@ -86,7 +91,14 @@ const enemy = new Fighter({
     {
         x: 50,
         y: 0
+    },
+    imageSrc: './assets/dariusStance.png',
+    framesMax: 5,
+    offset: {
+        x: -450,
+        y:140
     }
+    //scale: .75
 
 })
 

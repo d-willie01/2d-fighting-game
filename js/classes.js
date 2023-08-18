@@ -1,7 +1,7 @@
 
 class Sprite 
 {
-    constructor({position, imageSrc, scale = 1, framesMax = 1})
+    constructor({position, imageSrc, scale = 1, framesMax = 1, offset = {x:0,y:0}})
     {
 
         this.position = position
@@ -14,6 +14,7 @@ class Sprite
         this.framesCurrent = 0
         this.framesElapsed = 0
         this.framesHold = 5
+        this.offset = offset
     }
   
     draw() 
@@ -28,8 +29,8 @@ class Sprite
 
 
 
-                this.position.x,  
-                this.position.y, 
+                this.position.x - this.offset.x,  
+                this.position.y - this.offset.y, 
                 (this.image.width / this.framesMax) * this.scale, 
                 this.image.height * this.scale)
     }
@@ -53,17 +54,28 @@ class Sprite
 
 }
 
-class Fighter 
+class Fighter extends Sprite
 {
     //position and velocity are passed into the class
-    constructor({position, velocity, color= 'red', offset})
+    constructor({position, velocity, color= 'red', imageSrc, scale = 1, framesMax = 1, offset = {x:0,y:0}})
     {
+        super({
+            position,
+            imageSrc,
+            scale,
+            framesMax,
+            offset
+            
+        })
         //elements that can be manipulated independently from 'characters'
-        this.position = position
+    
         this.velocity = velocity
         this.width = 50
         this.height = 150
         this.lastKey
+        this.framesCurrent = 0
+        this.framesElapsed = 0
+        this.framesHold = 5
 
         //attackbox general area to land hitpoints on enemy, offset
         //is passed in to specify side of attack
@@ -91,23 +103,7 @@ class Fighter
         this.health = 100
     }
     //this methid draws the 'characters' to be seen on the canvas
-    draw() 
-    {
-
-        c.fillStyle= this.color
-        c.fillRect(this.position.x,this.position.y,this.width,150)
-
-        //attack box
-        if(this.isAttacking === true) 
-        {
-            c.fillStyle = 'green'
-            c.fillRect(this.attackBox.position.x, 
-            this.attackBox.position.y,
-            this.attackBox.width, 
-            this.attackBox.height)
-        }
-        
-    }
+    
     //this method is used to update the velocity or postion of the 
     //character on the canvas, and is where gravity comes into play
     update ()
